@@ -18,7 +18,13 @@
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
-        <activity android:name=".activities.MovieDetailsActivity"></activity>
+        <activity android:name=".activities.MovieDetailsActivity" />
+
+        <provider
+            android:name=".provider.MoviesInfoProvider"
+            android:authorities="com.duccipopi.popularmovies.movieinfo"
+            android:enabled="true"
+            android:exported="true"></provider>
     </application>
 
 </manifest>

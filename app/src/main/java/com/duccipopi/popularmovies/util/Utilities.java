@@ -41,22 +41,20 @@ public final class Utilities {
     }
 
     public static void loadImageByURL(Context context, URL url, ImageView holder) {
-        Picasso.with(context).load(url.toString()).into(holder);
-        Picasso.with(context).setLoggingEnabled(true);
+        loadImageByString(context, url.toString(), holder);
     }
 
-    public static ArrayList<MovieInfo> getMovies(int maxItems) {
+    public static ArrayList<MovieInfo> getRandomMovies(int maxItems) {
 
         ArrayList<MovieInfo> movieInfoArrayList = new ArrayList<>(maxItems);
 
         for (int i = 0; i < maxItems; i++) {
-            movieInfoArrayList.add(new MovieInfo(
+            movieInfoArrayList.add(new MovieInfo((int) Math.random(),
                     getRandomName(),
                     getRandomImageURL(IMAGE_SOURCE.LOREM_FLICKER),
                     getRandomText(maxItems*10),
                     (int) Math.random(),
-                    (new Date()).toString()
-            ));
+                    (new Date()).toString()));
         }
 
         return movieInfoArrayList;

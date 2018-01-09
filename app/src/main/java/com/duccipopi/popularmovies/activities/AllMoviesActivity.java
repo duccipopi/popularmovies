@@ -12,8 +12,11 @@ import android.view.View;
 import com.duccipopi.popularmovies.R;
 import com.duccipopi.popularmovies.moviedb.MovieInfo;
 import com.duccipopi.popularmovies.moviedb.MoviePosterAdapter;
-import com.duccipopi.popularmovies.network.ITaskCallBack;
+import com.duccipopi.popularmovies.provider.MovieInfoDBQueryTask;
+import com.duccipopi.popularmovies.provider.MoviesInfoContract;
+import com.duccipopi.popularmovies.util.ITaskCallBack;
 import com.duccipopi.popularmovies.network.JSONQueryTask;
+import com.duccipopi.popularmovies.provider.MovieInfoDAO;
 import com.duccipopi.popularmovies.util.JSON2MovieInfoArrayConverter;
 
 import org.json.JSONException;
@@ -24,12 +27,17 @@ import java.util.ArrayList;
 
 import static com.duccipopi.popularmovies.moviedb.MovieDBURLHelper.getMovieQueryURL;
 
-public class AllMoviesActivity extends AppCompatActivity implements ITaskCallBack<String> {
+public class AllMoviesActivity extends AppCompatActivity implements ITaskCallBack {
 
     private static final int MAX_COLUMNS = 5;
     private static final String SAVED_INSTANCE_BUNDLE = "movies";
+    private static final String SAVED_INSTANCE_FILTER = "filter";
 
-    private static boolean popularMoviesFilter = true;
+    private static final int FILTER_POPULAR_MOVIES = 0;
+    private static final int FILTER_TOP_RATED_MOVIES = 1;
+    private static final int FILTER_FAVORITES = 2;
+
+    private static int currentFilter = FILTER_POPULAR_MOVIES;
 
     RecyclerView allMoviesList;
     MoviePosterAdapter moviePosterAdapter;
@@ -48,7 +56,7 @@ public class AllMoviesActivity extends AppCompatActivity implements ITaskCallBac
         fab_filter = findViewById(R.id.fab_filter);
         fab_filter.setOnClickListener(new FilterOnClickListener(this));
 
-        updateTitle(popularMoviesFilter);
+        updateTitle(currentFilter);
 
         // Recycler view init
         allMoviesList = findViewById(R.id.rv_movies_list);
@@ -60,25 +68,48 @@ public class AllMoviesActivity extends AppCompatActivity implements ITaskCallBac
         if(savedInstanceState == null
                 || !savedInstanceState.containsKey(SAVED_INSTANCE_BUNDLE)
                 || savedInstanceState.getParcelableArrayList(SAVED_INSTANCE_BUNDLE) == null) {
-            movieDBQuery(this, popularMoviesFilter);
+            movieDBQuery(this, currentFilter);
         }
         else {
             movies = savedInstanceState.getParcelableArrayList(SAVED_INSTANCE_BUNDLE);
-            moviesPoster = extractPoster(movies);
+            currentFilter = savedInstanceState.getInt(SAVED_INSTANCE_FILTER);
 
-            moviePosterAdapter = new MoviePosterAdapter(this, moviesPoster, new PosterOnClickListener(this));
-            allMoviesList.setAdapter(moviePosterAdapter);
+            fab_filter.setImageLevel(currentFilter);
+
+            updateAdapter();
         }
 
     }
 
-    private void movieDBQuery(ITaskCallBack callBack, boolean popularMovies) {
-        // Start Async task to gather Movies DB info
-        JSONQueryTask queryTask = new JSONQueryTask(callBack);
-        try {
-            queryTask.execute(getMovieQueryURL(popularMovies));
-        } catch (MalformedURLException e) {
-            e.printStackTrace();
+    @Override
+    protected void onResume() {
+        super.onResume();
+
+        if (currentFilter == FILTER_FAVORITES) {
+            // Query local database
+            MovieInfoDBQueryTask queryTask = new MovieInfoDBQueryTask(this, this);
+            queryTask.execute((Void[]) null);
+        }
+
+    }
+
+    private void movieDBQuery(ITaskCallBack callBack, int filter) {
+
+        if (filter == FILTER_FAVORITES) {
+            // Query local database
+            MovieInfoDBQueryTask queryTask = new MovieInfoDBQueryTask(this, this);
+            queryTask.execute((Void[]) null);
+
+        } else {
+            // Query MovieDB database
+            boolean popularMovies = filter == FILTER_POPULAR_MOVIES;
+            // Start Async task to gather Movies DB info
+            JSONQueryTask queryTask = new JSONQueryTask(callBack);
+            try {
+                queryTask.execute(getMovieQueryURL(popularMovies));
+            } catch (MalformedURLException e) {
+                e.printStackTrace();
+            }
         }
     }
 
@@ -92,29 +123,50 @@ public class AllMoviesActivity extends AppCompatActivity implements ITaskCallBac
         return posters;
     }
 
-    public void updateTitle(boolean popularMovies) {
-        setTitle(popularMovies ? R.string.popular_movies : R.string.top_rated_movies);
+    public void updateTitle(int filter) {
+        int title = R.string.popular_movies;
+        switch (filter) {
+            case FILTER_POPULAR_MOVIES:
+                title = R.string.popular_movies;
+                break;
+            case FILTER_TOP_RATED_MOVIES:
+                title = R.string.top_rated_movies;
+                break;
+            case FILTER_FAVORITES:
+                title = R.string.favorite_movies;
+                break;
+        }
+        setTitle(title);
     }
 
     @Override
-    public void call(String result) {
+    public void call(Object result) {
 
-        JSONObject query = null;
-        try {
-            query = new JSONObject(result);
-        } catch (JSONException e) {
-            e.printStackTrace();
+        if (result instanceof String) {
+
+            JSONObject query = null;
+            try {
+                query = new JSONObject((String) result);
+            } catch (JSONException e) {
+                e.printStackTrace();
+            }
+
+            JSON2MovieInfoArrayConverter converter = new JSON2MovieInfoArrayConverter();
+            // Movie info gathering
+            movies = converter.convert(query);
+        } else if (result instanceof ArrayList) {
+            movies = (ArrayList<MovieInfo>) result;
         }
 
-        JSON2MovieInfoArrayConverter converter = new JSON2MovieInfoArrayConverter();
-        // Movie info gathering
-        movies = converter.convert(query);
+
+        updateAdapter();
+
+    }
+
+    private void updateAdapter() {
         moviesPoster = extractPoster(movies);
-
         moviePosterAdapter = new MoviePosterAdapter(this, moviesPoster, new PosterOnClickListener(this));
-
         allMoviesList.setAdapter(moviePosterAdapter);
-
     }
 
     private class FilterOnClickListener implements View.OnClickListener {
@@ -128,13 +180,12 @@ public class AllMoviesActivity extends AppCompatActivity implements ITaskCallBac
         @Override
         public void onClick(View view) {
             if (view instanceof FloatingActionButton) {
-                popularMoviesFilter = !popularMoviesFilter;
+                currentFilter = (++currentFilter) % 3;
 
-                ((FloatingActionButton) view).setImageLevel(popularMoviesFilter ? 0 : 1);
+                ((FloatingActionButton) view).setImageLevel(currentFilter);
 
-                updateTitle(popularMoviesFilter);
-
-                movieDBQuery(mCallBack, popularMoviesFilter);
+                updateTitle(currentFilter);
+                movieDBQuery(mCallBack, currentFilter);
             }
         }
     }
@@ -158,6 +209,7 @@ public class AllMoviesActivity extends AppCompatActivity implements ITaskCallBac
     @Override
     public void onSaveInstanceState(Bundle outState) {
         outState.putParcelableArrayList(SAVED_INSTANCE_BUNDLE, movies);
+        outState.putInt(SAVED_INSTANCE_FILTER, currentFilter);
         super.onSaveInstanceState(outState);
     }
 }

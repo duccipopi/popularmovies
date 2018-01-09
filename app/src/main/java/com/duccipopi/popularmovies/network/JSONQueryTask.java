@@ -2,6 +2,8 @@ package com.duccipopi.popularmovies.network;
 
 import android.os.AsyncTask;
 
+import com.duccipopi.popularmovies.util.ITaskCallBack;
+
 import java.io.BufferedInputStream;
 import java.io.BufferedReader;
 import java.io.IOException;

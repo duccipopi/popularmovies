@@ -1,4 +1,4 @@
-package com.duccipopi.popularmovies.network;
+package com.duccipopi.popularmovies.util;
 
 /**
  * Created by ducci on 30/12/2017.

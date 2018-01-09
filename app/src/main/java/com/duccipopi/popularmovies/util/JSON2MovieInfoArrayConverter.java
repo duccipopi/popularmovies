@@ -12,10 +12,11 @@ import java.util.ArrayList;
  * Created by ducci on 30/12/2017.
  */
 
-public class JSON2MovieInfoArrayConverter extends Converter<JSONObject, ArrayList<MovieInfo>> {
+public class JSON2MovieInfoArrayConverter implements Converter<JSONObject, ArrayList<MovieInfo>> {
 
     private static final String ARRAY_RESULTS = "results";
 
+    private static final String ITEM_ID = "id";
     private static final String ITEM_ORIGINAL_TITLE = "original_title";
     private static final String ITEM_POSTER = "poster_path";
     private static final String ITEM_OVERVIEW = "overview";
@@ -33,12 +34,12 @@ public class JSON2MovieInfoArrayConverter extends Converter<JSONObject, ArrayLis
                 for (int i = 0; i < results.length(); i++) {
                     JSONObject item = results.getJSONObject(i);
                     movies.add(new MovieInfo(
+                            item.getInt(ITEM_ID),
                             item.getString(ITEM_ORIGINAL_TITLE),
                             item.getString(ITEM_POSTER),
                             item.getString(ITEM_OVERVIEW),
                             item.getInt(ITEM_USER_RATING),
-                            item.getString(ITEM_RELEASE_DATE)
-                    ));
+                            item.getString(ITEM_RELEASE_DATE)));
                 }
 
             } catch (JSONException e) {

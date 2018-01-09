@@ -1,7 +1,9 @@
 <?xml version="1.0" encoding="utf-8"?>
 <level-list xmlns:android="http://schemas.android.com/apk/res/android">
-    <item android:drawable="@android:drawable/btn_star"
+    <item android:drawable="@drawable/ic_top_rated"
         android:maxLevel="0" />
-    <item android:drawable="@android:drawable/ic_menu_view"
+    <item android:drawable="@drawable/ic_favorited_white"
         android:maxLevel="1" />
+    <item android:drawable="@drawable/ic_popular"
+        android:maxLevel="2" />
 </level-list>

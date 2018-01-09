@@ -1,0 +1,92 @@
+<?xml version="1.0" encoding="utf-8"?>
+<android.support.constraint.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="wrap_content"
+    android:layout_height="match_parent"
+    xmlns:app="http://schemas.android.com/apk/res-auto">
+
+    <ImageView
+        android:id="@+id/iv_details_poster"
+        android:layout_width="185dp"
+        android:layout_height="278dp"
+        android:adjustViewBounds="true"
+        android:scaleType="centerCrop"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        app:srcCompat="@drawable/ic_launcher_background" />
+
+    <TextView
+        android:id="@+id/tv_details_title"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:paddingLeft="@dimen/constraint_padding"
+        android:text="TextView"
+        android:textAppearance="@style/Base.TextAppearance.AppCompat.Medium"
+        android:textStyle="bold"
+        app:layout_constraintStart_toEndOf="@id/iv_details_poster"
+        app:layout_constraintTop_toTopOf="parent" />
+
+    <TextView
+        android:id="@+id/label_details_release_date"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:paddingLeft="@dimen/constraint_padding"
+        android:text="@string/details_release_date"
+        android:textStyle="bold"
+        app:layout_constraintStart_toEndOf="@id/iv_details_poster"
+        app:layout_constraintTop_toBottomOf="@id/tv_details_title" />
+
+    <TextView
+        android:id="@+id/tv_details_release_date"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:paddingLeft="@dimen/constraint_padding"
+        android:text="@string/details_release_date"
+        app:layout_constraintStart_toEndOf="@id/label_details_release_date"
+        app:layout_constraintTop_toTopOf="@id/label_details_release_date" />
+
+    <TextView
+        android:id="@+id/label_details_user_rating"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:paddingLeft="@dimen/constraint_padding"
+        android:text="@string/details_user_rating"
+        android:textStyle="bold"
+        app:layout_constraintStart_toEndOf="@id/iv_details_poster"
+        app:layout_constraintTop_toBottomOf="@id/label_details_release_date" />
+
+    <TextView
+        android:id="@+id/tv_details_user_rating"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:paddingLeft="@dimen/constraint_padding"
+        android:text="@string/details_user_rating"
+        app:layout_constraintStart_toEndOf="@id/label_details_user_rating"
+        app:layout_constraintTop_toTopOf="@id/label_details_user_rating" />
+
+    <CheckBox
+        android:id="@+id/cb_favorite"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:button="@drawable/ic_favorite_button"
+        app:layout_constraintBottom_toBottomOf="@id/iv_details_poster"
+        app:layout_constraintEnd_toEndOf="@id/iv_details_poster" />
+
+    <TextView
+        android:id="@+id/label_details_overview"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:paddingTop="@dimen/constraint_padding"
+        android:text="@string/details_overview"
+        android:textAppearance="@style/Base.TextAppearance.AppCompat.Medium"
+        android:textStyle="bold"
+        app:layout_constraintTop_toBottomOf="@id/iv_details_poster" />
+
+    <TextView
+        android:id="@+id/tv_details_overview"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="@string/details_overview"
+        app:layout_constraintTop_toBottomOf="@id/label_details_overview" />
+
+
+</android.support.constraint.ConstraintLayout>
